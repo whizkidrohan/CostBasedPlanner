@@ -59,6 +59,7 @@ class DiscreteEnvironment(object):
         config = [0] * self.dimension
         for i in range(self.dimension):
         	config[i] = self.lower_limits[i] + coord[i]*self.resolution[i] + 0.5*self.resolution[i]
+        	
         return config
 
     def GridCoordToNodeId(self,coord):
@@ -68,13 +69,15 @@ class DiscreteEnvironment(object):
         # node id 
         node_id = 0
         for i in range(self.dimension):
+        	
         	prod = 1
         	if self.dimension-i-1 != 0:
 	        	for j in range(self.dimension-i-1):
-	        		prod=prod*self.num_cells[j-1]
-	            node_id = node_id + prod*coord[self.dimension-i-1]
-            else 
-                node_id = node_id + coord[self.dimension-i-1]
+	        		prod=prod*self.num_cells[j-1][0]
+	        	node_id = node_id + prod*coord[self.dimension-i-1]
+        	else:
+				node_id = node_id + coord[self.dimension-i-1]
+
         return node_id
 
     def NodeIdToGridCoord(self, node_id):
@@ -88,11 +91,9 @@ class DiscreteEnvironment(object):
             prod = 1
             if self.dimension-i-1 != 0:
                 for j in range(self.dimension-i-1):
-                    prod=prod*self.num_cells[j-1]
-                coord[self.dimension-i-1] = math.floor(sum/prod)
+                    prod=prod*self.num_cells[j-1][0]
+                coord[self.dimension-i-1] = numpy.floor(sum/prod)
                 sum = sum % prod
-            else 
+            else:
                 coord[self.dimension-i-1] = sum
-
         return coord
-
