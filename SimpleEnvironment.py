@@ -28,7 +28,22 @@ class SimpleEnvironment(object):
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids that represent the neighboring
         #  nodes
-        
+        coord = self.discrete_env.NodeIdToGridCoord(node_id)
+        ACTIONS = [(0,1),(0,-1),(1,0),(-1,0)]
+        print coord
+        for action in ACTIONS:
+            successor = (map(lambda x,y: x+y, action, coord))
+            if successor[0] < self.lower_limits[0] or \
+            successor[1] > self.upper_limits[1] or    \
+            successor[0] < self.lower_limits[0] or    \
+            successor[1] > self.upper_limits[1]:
+                continue
+            successors.append(successor)
+        successors_coords = successors
+        successors = []
+        for successor_coord in successors_coords:
+            successors.append(self.discrete_env.GridCoordToNodeId(successor_coord))
+
         return successors
 
     def ComputeDistance(self, start_id, end_id):
