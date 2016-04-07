@@ -43,17 +43,18 @@ class SimpleEnvironment(object):
         successors = []
         for successor_coord in successors_coords:
             successors.append(self.discrete_env.GridCoordToNodeId(successor_coord))
-
         return successors
 
     def ComputeDistance(self, start_id, end_id):
 
         dist = 0
-
+        start_coord = self.discrete_env.NodeIdToGridCoord(start_id)
+        end_coord = self.discrete_env.NodeIdToGridCoord(end_id)
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
         # by the two node ids
-
+        dist = abs(start_coord[0] - end_coord[0]) + abs(start_coord[1] - end_coord[1])
+        print dist
         return dist
 
     def ComputeHeuristicCost(self, start_id, goal_id):
@@ -63,9 +64,10 @@ class SimpleEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
-
+        cost = self.ComputeDistance(start_id, goal_id)
+        print cost, '=cost'
         return cost
-
+    
     def InitializePlot(self, goal_config):
         self.fig = pl.figure()
         pl.xlim([self.lower_limits[0], self.upper_limits[0]])

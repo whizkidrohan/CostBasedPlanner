@@ -56,7 +56,7 @@ class DiscreteEnvironment(object):
         # This function smaps a grid coordinate in discrete space
         # to a configuration in the full configuration space
         #
-        config = [0] * self.dimension                
+        config = [0] * self.dimension
         for i in range(self.dimension):
         	config[i] = self.lower_limits[i] + coord[i]*self.resolution[i] + 0.5*self.resolution[i]
         return config
@@ -95,3 +95,4 @@ class DiscreteEnvironment(object):
                 coord[self.dimension-i-1] = sum
 
         return coord
+
