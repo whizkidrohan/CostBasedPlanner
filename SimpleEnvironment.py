@@ -9,11 +9,9 @@ class SimpleEnvironment(object):
         self.lower_limits = [-5., -5.]
         self.upper_limits = [5., 5.]
         self.discrete_env = DiscreteEnvironment(resolution, self.lower_limits, self.upper_limits)
-
         # add an obstacle
         table = self.robot.GetEnv().ReadKinBodyXMLFile('models/objects/table.kinbody.xml')
         self.robot.GetEnv().Add(table)
-
         table_pose = numpy.array([[ 0, 0, -1, 1.5], 
                                   [-1, 0,  0, 0], 
                                   [ 0, 1,  0, 0], 
@@ -23,7 +21,6 @@ class SimpleEnvironment(object):
     def GetSuccessors(self, node_id):
 
         successors = []
-
         # TODO: Here you will implement a function that looks
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids that represent the neighboring
@@ -99,5 +96,3 @@ class SimpleEnvironment(object):
                 [sconfig[1], econfig[1]],
                 'k.-', linewidth=2.5)
         pl.draw()
-
-        
