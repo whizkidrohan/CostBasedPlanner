@@ -51,11 +51,12 @@ class DiscreteEnvironment(object):
         return coord
 
     def GridCoordToConfiguration(self, coord):
+
         # TODO:
         # This function smaps a grid coordinate in discrete space
         # to a configuration in the full configuration space
         #
-                                                                                              xconfig = [0] * self.dimension
+        config = [0] * self.dimension                
         for i in range(self.dimension):
         	config[i] = self.lower_limits[i] + coord[i]*self.resolution[i] + 0.5*self.resolution[i]
         return config
@@ -71,7 +72,9 @@ class DiscreteEnvironment(object):
         	if self.dimension-i-1 != 0:
 	        	for j in range(self.dimension-i-1):
 	        		prod=prod*self.num_cells[j-1]
-	        node_id = node_id + prod*coord[self.dimension-i-1]
+	            node_id = node_id + prod*coord[self.dimension-i-1]
+            else 
+                node_id = node_id + coord[self.dimension-i-1]
         return node_id
 
     def NodeIdToGridCoord(self, node_id):
@@ -80,9 +83,15 @@ class DiscreteEnvironment(object):
         # This function maps a node id to the associated
         # grid coordinate
         coord = [0] * self.dimension
+        sum = node_id
         for i in range(self.dimension):
-        	
+            prod = 1
+            if self.dimension-i-1 != 0:
+                for j in range(self.dimension-i-1):
+                    prod=prod*self.num_cells[j-1]
+                coord[self.dimension-i-1] = math.floor(sum/prod)
+                sum = sum % prod
+            else 
+                coord[self.dimension-i-1] = sum
+
         return coord
-        
-        
-        
