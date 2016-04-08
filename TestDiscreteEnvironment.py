@@ -2,7 +2,7 @@ import numpy as np
 from DiscreteEnvironment import DiscreteEnvironment
 
 
-DE =  DiscreteEnvironment(np.array([0.2] * 2),np.array([-5] * 2),np.array([5] * 2))
+DE =  DiscreteEnvironment(0.2 ,np.array([-5] * 2),np.array([5] * 2))
 #print DE.lower_limits
 #print DE.resolution
 

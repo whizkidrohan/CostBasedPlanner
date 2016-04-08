@@ -38,6 +38,26 @@ class HerbEnvironment(object):
 
         successors = []
 
+        coord = self.discrete_env.NodeIdToGridCoord(node_id)
+
+        #for example: [1,2,3,4,5,6,7]
+        new = []
+
+
+        for i in range(len(coord)):
+            new = list(coord)
+            new[i] += 1
+            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.CollisionCheck(new):
+                continue
+            successors.append(new)
+
+            new = list(coord)
+            new[i] -= 1
+            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.CollisionCheck(new):
+                continue
+            successors.append(new)
+ 
+
         # TODO: Here you will implement a function that looks
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids that represent the neighboring
@@ -45,9 +65,33 @@ class HerbEnvironment(object):
         
         return successors
 
+    def CollisionCheck(self, node_coord):
+        config = self.discrete_env.GridCoordToConfiguration(node_coord)
+        with self.robot.GetEnv():
+            self.robot.SetDOFValues(config, self.robot.GetActiveDOFIndices())
+        
+        # collision check: when there is collision, return true
+        check_1 = self.robot.GetEnv().CheckCollision(self.robot) 
+
+        # self collision check: when self collision, return true
+        check_2 = self.robot.CheckSelfCollision()
+
+        # we want both to be false
+        check = check_1 or check_2
+        print check
+        #if collision, true
+        return check
+
+
+
     def ComputeDistance(self, start_id, end_id):
 
         dist = 0
+
+        start_coord = self.discrete_env.NodeIdToGridCoord(start_id)
+        end_coord = self.discrete_env.NodeIdToGridCoord(end_id)
+
+        dist = numpy.linalg.norm(numpy.array(start_coord) - numpy.array(end_coord))
 
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
@@ -62,6 +106,6 @@ class HerbEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
-        
+        cost = self.ComputeDistance(start_id, goal_id)
         return cost
 
