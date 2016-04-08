@@ -26,8 +26,8 @@ class DiscreteEnvironment(object):
         # space to a node in discrete space
         #
         node_id = 0
-        grid = ConfigurationToGridCoord(config)
-        node_id = GridCoordToNodeId(grid)
+        grid = self.ConfigurationToGridCoord(config)
+        node_id = self.GridCoordToNodeId(grid)
         return node_id
 
     def NodeIdToConfiguration(self, nid):
@@ -37,8 +37,8 @@ class DiscreteEnvironment(object):
         # in the full configuration space
         #
         config = [0] * self.dimension
-        grid = NodeIdToGridCoord(nid)
-        config = GridCoordToConfiguration(grid)
+        grid = self.NodeIdToGridCoord(nid)
+        config = self.GridCoordToConfiguration(grid)
         return config
         
     def ConfigurationToGridCoord(self, config):

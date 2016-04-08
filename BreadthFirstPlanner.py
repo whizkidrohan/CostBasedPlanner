@@ -18,4 +18,7 @@ class BreadthFirstPlanner(object):
         c = []        
         plan.append(start_config)
         plan.append(goal_config)
+        o.append(start_config)
+        while o:
+            N= o
         return plan
