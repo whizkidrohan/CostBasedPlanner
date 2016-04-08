@@ -37,12 +37,16 @@ class HerbEnvironment(object):
     def GetSuccessors(self, node_id):
 
         successors = []
-
+        successors_id = []
         coord = self.discrete_env.NodeIdToGridCoord(node_id)
 
         #for example: [1,2,3,4,5,6,7]
         new = []
-
+        
+        # TODO: Here you will implement a function that looks
+        #  up the configuration associated with the particular node_id
+        #  and return a list of node_ids that represent the neighboring
+        #  nodes
 
         for i in range(len(coord)):
             new = list(coord)
@@ -56,14 +60,11 @@ class HerbEnvironment(object):
             if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.CollisionCheck(new):
                 continue
             successors.append(new)
- 
-
-        # TODO: Here you will implement a function that looks
-        #  up the configuration associated with the particular node_id
-        #  and return a list of node_ids that represent the neighboring
-        #  nodes
+            
+        for item in successors:
+            successors_id.append(self.discrete_env.GridCoordToNodeId(item))
+        return successors_id
         
-        return successors
 
     def CollisionCheck(self, node_coord):
         config = self.discrete_env.GridCoordToConfiguration(node_coord)
