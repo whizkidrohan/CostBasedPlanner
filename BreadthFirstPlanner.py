@@ -1,6 +1,5 @@
 import Queue
 
-
 class BreadthFirstPlanner(object):
     
     def __init__(self, planning_env, visualize):
