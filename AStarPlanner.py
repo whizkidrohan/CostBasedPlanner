@@ -8,7 +8,8 @@ class AStarPlanner(object):
         self.nodes = dict()
 
     def Plan(self, start_config, goal_config):
-        #self.planning_env.InitializePlot(goal_config)
+        if self.visualize and hasattr(self.planning_env, 'InitializePlot'):
+            self.planning_env.InitializePlot(goal_config)
         plan = []
         plan_config = []
         # TODO: Here you will implement the breadth first planner
@@ -37,10 +38,11 @@ class AStarPlanner(object):
             successors = self.planning_env.GetSuccessors(N[2])
             for successor in successors:
                 if not self.in_closed_list(closed_list, successor):
-                    if not self.is_cheaper_in_open_list(open_list.queue,(N[3]+1+self.planning_env.ComputeHeuristicCost(N[2],goal_nid),N[2],successor,N[3]+1)):
-                        open_list.put((N[3]+1+self.planning_env.ComputeHeuristicCost(N[2],goal_nid),N[2],successor,N[3]+1))
-#                        self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
-#                            self.planning_env.discrete_env.NodeIdToConfiguration(successor))
+                    if not self.is_cheaper_in_open_list(open_list.queue,(N[3]+1+self.planning_env.ComputeHeuristicCost(successor,goal_nid),N[2],successor,N[3]+1)):
+                        open_list.put((N[3]+1+self.planning_env.ComputeHeuristicCost(successor,goal_nid),N[2],successor,N[3]+1))
+                        if self.visualize and hasattr(self.planning_env, 'InitializePlot'): 
+                            self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
+                                self.planning_env.discrete_env.NodeIdToConfiguration(successor))
         plan.append(start_nid)
         print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
         plan = plan[::-1]

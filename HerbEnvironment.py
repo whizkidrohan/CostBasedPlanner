@@ -90,6 +90,7 @@ class HerbEnvironment(object):
         start_coord = self.discrete_env.NodeIdToGridCoord(start_id)
         end_coord = self.discrete_env.NodeIdToGridCoord(end_id)
         weights=[4,4,4,1,1,1,1]
+
         dist = numpy.linalg.norm(weights*(numpy.array(start_coord) - numpy.array(end_coord)))
 
         # TODO: Here you will implement a function that 
@@ -108,3 +109,69 @@ class HerbEnvironment(object):
         cost = self.ComputeDistance(start_id, goal_id)
         return cost
 
+
+    def Extend(self, start_config, end_config):
+        
+        #
+        # TODO: Implement a function which attempts to extend from 
+        #   a start configuration to a goal configuration
+        #
+        
+        stepSize = 0.1
+        numOfInterp = int(self.ComputeDistance(start_config, end_config)/stepSize)
+        #print "numOfInterp", numOfInterp
+        interp_config = numpy.zeros(len(start_config))
+        i=0
+        
+        for i in range(numOfInterp):
+            for j in range(len(start_config)):
+                interp_config[j] = numpy.linspace(start_config[j], end_config[j], numOfInterp)[i]
+
+            check = self.CollisionChecker(interp_config)
+
+            if check == False:
+                extend_config = numpy.array(interp_config)
+            else:
+                break
+
+        if i == 1 or i == 0:
+            #print "can't extend"
+            return None
+        else:
+            #print "---- extend ----, i-->", i 
+            
+            return extend_config
+
+    def ShortenPath(self, path, timeout=5.0):
+        
+        tstart = time.time()
+
+        while ( (time.time() - tstart) < timeout ):
+
+
+            x1, x2 = sorted(random.sample(range(len(path)), 2))
+
+
+            #x1 = int(numpy.random.uniform(0,len(path)-1))
+            #x2 = int(numpy.random.uniform(x1+1,len(path)-1))
+            start_config = path[x1]
+            end_config = path[x2]
+
+            #print (x1,x2)
+            #print len(path)
+            #print path
+
+            extend_config = self.Extend(start_config, end_config)
+
+            if extend_config != None:
+                if all(extend_config ==  end_config):
+                    
+                    #print "successful connection"
+                    new_path = []
+                    for i in range(0,x1+1):
+                        new_path.append(path[i])
+                    for i in range(x2,len(path)):
+                        new_path.append(path[i])
+                    path = new_path
+        
+        return path
