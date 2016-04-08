@@ -1,4 +1,4 @@
-import numpy
+ import numpy
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
 
@@ -38,15 +38,28 @@ class SimpleEnvironment(object):
             if successor[0] < 0 or \
             successor[0] > self.discrete_env.num_cells[0]-1 or    \
             successor[1] < 0 or    \
-            successor[1] > self.discrete_env.num_cells[1]-1:
+            successor[1] > self.discrete_env.num_cells[1]-1 or \
+            self.CollisionChecker(successor):
                 continue
             successors.append(successor)
-        successors_coords = successors
-        successors = []
-        for successor_coord in successors_coords:
-            successors.append(self.discrete_env.GridCoordToNodeId(successor_coord))
+       
+        for item in successors:
+            successors_id.append(self.discrete_env.GridCoordToNodeId(item))
 
-        return successors
+        return successors_id
+
+    def CollisionChecker(self, node_coord):
+        config = self.discrete_env.GridCoordToConfiguration(node_coord)
+        config_pose = numpy.array([[ 1, 0,  0, config[0]], 
+                                   [ 0, 1,  0, config[1]], 
+                                   [ 0, 0,  1, 0], 
+                                   [ 0, 0,  0, 1]])
+
+        with self.robot.GetEnv():
+            self.robot.SetTransform(config_pose)
+
+        check = self.robot.GetEnv().CheckCollision(self.robot)
+        return check
 
     def ComputeDistance(self, start_id, end_id):
 
