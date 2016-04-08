@@ -47,15 +47,13 @@ class HerbEnvironment(object):
         for i in range(len(coord)):
             new = list(coord)
             new[i] += 1
-
-            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1:
+            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.collisionCheck(new):
                 continue
             successors.append(new)
 
             new = list(coord)
             new[i] -= 1
-
-            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1:
+            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.collisionCheck(new):
                 continue
             successors.append(new)
  
@@ -66,6 +64,25 @@ class HerbEnvironment(object):
         #  nodes
         
         return successors
+
+    def collisionCheck(self, node_coord):
+        config = self.discrete_env.GridCoordToConfiguration(node_coord)
+        with self.robot.GetEnv():
+            self.robot.SetDOFValues(config, self.robot.GetActiveDOFIndices())
+        
+        # collision check: when there is collision, return true
+        check_1 = self.robot.GetEnv().CheckCollision(self.robot) 
+
+        # self collision check: when self collision, return true
+        check_2 = self.robot.CheckSelfCollision()
+
+        # we want both to be false
+        check = check_1 or check_2
+        print check
+        #if collision, true
+        return check
+
+
 
     def ComputeDistance(self, start_id, end_id):
 
