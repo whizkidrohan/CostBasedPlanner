@@ -1,4 +1,4 @@
- import numpy
+import numpy
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
 import copy
@@ -28,7 +28,7 @@ class SimpleEnvironment(object):
         #  and return a list of node_ids that represent the neighboring
         #  nodes
 
-        
+        successors_id = []
         coord = self.discrete_env.NodeIdToGridCoord(node_id)
         ACTIONS = [(0,1),(0,-1),(1,0),(-1,0)]
         

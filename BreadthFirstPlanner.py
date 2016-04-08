@@ -8,11 +8,14 @@ class BreadthFirstPlanner(object):
         self.visualize = visualize
         
     def Plan(self, start_config, goal_config):
+        #self.planning_env.InitializePlot(goal_config)
         plan = []
+        plan_config = []
         # TODO: Here you will implement the breadth first planner
         #  The return path should be a numpy array
         #  of dimension k x n where k is the number of waypoints
         #  and n is the dimension of the robots configuration space
+        print start_config
         start_nid = self.planning_env.discrete_env.ConfigurationToNodeId(start_config)
         goal_nid =  self.planning_env.discrete_env.ConfigurationToNodeId(goal_config)
         
@@ -33,10 +36,15 @@ class BreadthFirstPlanner(object):
             for successor in successors:
                 if not self.in_closed_list(closed_list, successor):
                     if not (N[0]+1,N[2],successor) in open_list.queue:
-                        open_list.put((N[0]+1,N[2],successor)) 
+                        open_list.put((N[0]+1,N[2],successor))
+         #               self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
+         #                   self.planning_env.discrete_env.NodeIdToConfiguration(successor))
         plan.append(start_nid)
         print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
-        return plan[::-1]
+        plan = plan[::-1]
+        for nodeId in plan:
+            plan_config.append(self.planning_env.discrete_env.NodeIdToConfiguration(nodeId))
+        return plan_config
 
     def in_closed_list(self,list_of_lists, element):
         for list_ in list_of_lists:
@@ -48,4 +56,3 @@ class BreadthFirstPlanner(object):
         for list_ in list_of_lists:
             if element == list_[1]:
                 return list_[0]
-

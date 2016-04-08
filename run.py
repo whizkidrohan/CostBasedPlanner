@@ -65,8 +65,8 @@ if __name__ == "__main__":
     elif args.robot == 'simple':
         robot = SimpleRobot(env)
         planning_env = SimpleEnvironment(robot, args.resolution)
-        print 'reso: ', args.resolution
-        print planning_env.GetSuccessors(0)
+#        print 'reso: ', args.resolution
+#        print planning_env.GetSuccessors(0)
     else:
         print 'Unknown robot option: %s' % args.robot
         exit(0)
