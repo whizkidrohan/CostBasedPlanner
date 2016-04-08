@@ -1,6 +1,7 @@
 import numpy
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
+import copy
 
 class SimpleEnvironment(object):
     
@@ -30,18 +31,16 @@ class SimpleEnvironment(object):
         
         coord = self.discrete_env.NodeIdToGridCoord(node_id)
         ACTIONS = [(0,1),(0,-1),(1,0),(-1,0)]
-        #print coord
+        
         for action in ACTIONS:
             successor = (map(lambda x,y: x+y, action, coord))
-            #print successor
-            
             if successor[0] < 0 or \
             successor[0] > self.discrete_env.num_cells[0]-1 or    \
             successor[1] < 0 or    \
             successor[1] > self.discrete_env.num_cells[1]-1:
                 continue
             successors.append(successor)
-        successors_coords = successors
+        successors_coords = copy.copy(successors)
         successors = []
         for successor_coord in successors_coords:
             successors.append(self.discrete_env.GridCoordToNodeId(successor_coord))
@@ -57,7 +56,6 @@ class SimpleEnvironment(object):
         # computes the distance between the configurations given
         # by the two node ids
         dist = abs(start_coord[0] - end_coord[0]) + abs(start_coord[1] - end_coord[1])
-        #print dist
         return dist
 
     def ComputeHeuristicCost(self, start_id, goal_id):
@@ -68,7 +66,6 @@ class SimpleEnvironment(object):
         # computes the heuristic cost between the configurations
         # given by the two node ids
         cost = self.ComputeDistance(start_id, goal_id)
-        #print cost, '=cost'
         return cost
     
     def InitializePlot(self, goal_config):
