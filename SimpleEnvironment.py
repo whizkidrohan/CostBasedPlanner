@@ -36,9 +36,9 @@ class SimpleEnvironment(object):
             #print successor
             
             if successor[0] < 0 or \
-            successor[0] > self.discrete_env.num_cells[0][0]-1 or    \
+            successor[0] > self.discrete_env.num_cells[0]-1 or    \
             successor[1] < 0 or    \
-            successor[1] > self.discrete_env.num_cells[1][0]-1:
+            successor[1] > self.discrete_env.num_cells[1]-1:
                 continue
             successors.append(successor)
         successors_coords = successors
