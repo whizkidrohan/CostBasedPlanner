@@ -8,7 +8,7 @@ class AStarPlanner(object):
         self.nodes = dict()
 
     def Plan(self, start_config, goal_config):
-        self.planning_env.InitializePlot(goal_config)
+        #self.planning_env.InitializePlot(goal_config)
         plan = []
         plan_config = []
         # TODO: Here you will implement the breadth first planner
@@ -22,10 +22,11 @@ class AStarPlanner(object):
         open_list = Queue.PriorityQueue()
         closed_list = []        
         open_list.put((0 + self.planning_env.ComputeHeuristicCost(start_nid,goal_nid),-1,start_nid,0))
-        
+        weight=[1,2,3,4,5,6,7]
         while open_list:
+            #if open_list.size() < 10:
+             #   print open_list
             N = open_list.get_nowait()
-            print N
             closed_list.append((N[1],N[2]));
             if N[2] == goal_nid:
                 current_node = N[2]
@@ -38,8 +39,8 @@ class AStarPlanner(object):
                 if not self.in_closed_list(closed_list, successor):
                     if not self.is_cheaper_in_open_list(open_list.queue,(N[3]+1+self.planning_env.ComputeHeuristicCost(N[2],goal_nid),N[2],successor,N[3]+1)):
                         open_list.put((N[3]+1+self.planning_env.ComputeHeuristicCost(N[2],goal_nid),N[2],successor,N[3]+1))
-                        self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
-                            self.planning_env.discrete_env.NodeIdToConfiguration(successor))
+#                        self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
+#                            self.planning_env.discrete_env.NodeIdToConfiguration(successor))
         plan.append(start_nid)
         print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
         plan = plan[::-1]
@@ -54,9 +55,13 @@ class AStarPlanner(object):
         return False
 
     def is_cheaper_in_open_list(self,list_of_lists, element):
+        ret = False
         for list_ in list_of_lists:
-            if element[2] == list_[2] and element[0]>list_[0]:
-                return True
+            if element[2] == list_[2]:
+                if element[0]>=list_[0]:
+                    return True
+                else:
+                    list_of_lists.remove(list_)
         return False
 
     def get_parent(self,list_of_lists,element):

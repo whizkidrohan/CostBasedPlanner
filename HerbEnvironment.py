@@ -51,15 +51,15 @@ class HerbEnvironment(object):
         for i in range(len(coord)):
             new = list(coord)
             new[i] += 1
-            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.CollisionCheck(new):
-                continue
-            successors.append(new)
+            if new[i] >= 0 and new[i] <= self.discrete_env.num_cells[i]-1:
+                if not self.CollisionCheck(new):
+                    successors.append(new)
 
             new = list(coord)
             new[i] -= 1
-            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1 or self.CollisionCheck(new):
-                continue
-            successors.append(new)
+            if new[i] >= 0 and new[i] <= self.discrete_env.num_cells[i]-1:
+                if not self.CollisionCheck(new):
+                    successors.append(new)
             
         for item in successors:
             successors_id.append(self.discrete_env.GridCoordToNodeId(item))
@@ -79,25 +79,23 @@ class HerbEnvironment(object):
 
         # we want both to be false
         check = check_1 or check_2
-        print check
+        
         #if collision, true
         return check
 
 
 
     def ComputeDistance(self, start_id, end_id):
-
         dist = 0
-
         start_coord = self.discrete_env.NodeIdToGridCoord(start_id)
         end_coord = self.discrete_env.NodeIdToGridCoord(end_id)
-
-        dist = numpy.linalg.norm(numpy.array(start_coord) - numpy.array(end_coord))
+        weights=[4,4,4,1,1,1,1]
+        dist = numpy.linalg.norm(weights*(numpy.array(start_coord) - numpy.array(end_coord)))
 
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
         # by the two node ids
-       
+
         return dist
 
     def ComputeHeuristicCost(self, start_id, goal_id):

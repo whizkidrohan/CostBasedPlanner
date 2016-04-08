@@ -7,7 +7,7 @@ class BreadthFirstPlanner(object):
         self.visualize = visualize
         
     def Plan(self, start_config, goal_config):
-        #self.planning_env.InitializePlot(goal_config)
+        self.planning_env.InitializePlot(goal_config)
         plan = []
         plan_config = []
         # TODO: Here you will implement the breadth first planner
@@ -36,8 +36,8 @@ class BreadthFirstPlanner(object):
                 if not self.in_closed_list(closed_list, successor):
                     if not (N[0]+1,N[2],successor) in open_list.queue:
                         open_list.put((N[0]+1,N[2],successor))
-         #               self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
-         #                   self.planning_env.discrete_env.NodeIdToConfiguration(successor))
+                        self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
+                            self.planning_env.discrete_env.NodeIdToConfiguration(successor))
         plan.append(start_nid)
         print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
         plan = plan[::-1]
