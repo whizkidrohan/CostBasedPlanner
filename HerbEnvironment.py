@@ -38,6 +38,28 @@ class HerbEnvironment(object):
 
         successors = []
 
+        coord = self.discrete_env.NodeIdToGridCoord(node_id)
+
+        #for example: [1,2,3,4,5,6,7]
+        new = []
+
+
+        for i in range(len(coord)):
+            new = list(coord)
+            new[i] += 1
+
+            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1:
+                continue
+            successors.append(new)
+
+            new = list(coord)
+            new[i] -= 1
+
+            if new[i] < 0 or new[i] > self.discrete_env.num_cells[i]-1:
+                continue
+            successors.append(new)
+ 
+
         # TODO: Here you will implement a function that looks
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids that represent the neighboring
@@ -48,6 +70,11 @@ class HerbEnvironment(object):
     def ComputeDistance(self, start_id, end_id):
 
         dist = 0
+
+        start_coord = self.discrete_env.NodeIdToGridCoord(start_id)
+        end_coord = self.discrete_env.NodeIdToGridCoord(end_id)
+
+        dist = numpy.linalg.norm(numpy.array(start_coord) - numpy.array(end_coord))
 
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
@@ -62,6 +89,6 @@ class HerbEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
-        
+        cost = self.ComputeDistance(start_id, goal_id)
         return cost
 
