@@ -52,13 +52,13 @@ class HerbEnvironment(object):
             new = list(coord)
             new[i] += 1
             if new[i] >= 0 and new[i] <= self.discrete_env.num_cells[i]-1:
-                if not self.CollisionCheck(new):
+                if not self.CollisionChecker(new):
                     successors.append(new)
 
             new = list(coord)
             new[i] -= 1
             if new[i] >= 0 and new[i] <= self.discrete_env.num_cells[i]-1:
-                if not self.CollisionCheck(new):
+                if not self.CollisionChecker(new):
                     successors.append(new)
             
         for item in successors:
@@ -66,7 +66,7 @@ class HerbEnvironment(object):
         return successors_id
         
 
-    def CollisionCheck(self, node_coord):
+    def CollisionChecker(self, node_coord):
         config = self.discrete_env.GridCoordToConfiguration(node_coord)
         with self.robot.GetEnv():
             self.robot.SetDOFValues(config, self.robot.GetActiveDOFIndices())
@@ -83,6 +83,21 @@ class HerbEnvironment(object):
         #if collision, true
         return check
 
+    def CollisionChecker_RRT(self, config):
+
+        with self.robot.GetEnv():
+            self.robot.SetDOFValues(config, self.robot.GetActiveDOFIndices())
+
+        # collision check: when there is collision, return true
+        check_1 = self.robot.GetEnv().CheckCollision(self.robot) 
+
+        # self collision check: when self collision, return true
+        check_2 = self.robot.CheckSelfCollision()
+
+        # we want both to be false
+        check = check_1 or check_2
+        
+        return check
 
 
     def ComputeDistance(self, start_id, end_id):
@@ -99,6 +114,12 @@ class HerbEnvironment(object):
 
         return dist
 
+    def ComputeDistanceRRT(self, start_config, end_config):
+
+        dist = numpy.linalg.norm(numpy.array(start_config) - numpy.array(end_config))
+
+        return dist
+
     def ComputeHeuristicCost(self, start_id, goal_id):
         
         cost = 0
@@ -110,37 +131,23 @@ class HerbEnvironment(object):
         return cost
 
 
-    def Extend(self, start_config, end_config):
-        
-        #
-        # TODO: Implement a function which attempts to extend from 
-        #   a start configuration to a goal configuration
-        #
-        
-        stepSize = 0.1
-        numOfInterp = int(self.ComputeDistance(start_config, end_config)/stepSize)
-        #print "numOfInterp", numOfInterp
-        interp_config = numpy.zeros(len(start_config))
-        i=0
-        
-        for i in range(numOfInterp):
-            for j in range(len(start_config)):
-                interp_config[j] = numpy.linspace(start_config[j], end_config[j], numOfInterp)[i]
+    def GenerateRandomConfiguration(self):
+        config = [0] * len(self.robot.GetActiveDOFIndices())
 
-            check = self.CollisionChecker(interp_config)
+        #
+        # TODO: Generate and return a random configuration
+        #
+
+        while True:
+           
+            config = numpy.random.uniform(self.lower_limits, self.upper_limits)
+            
+            check = self.CollisionChecker_RRT(config)
 
             if check == False:
-                extend_config = numpy.array(interp_config)
-            else:
                 break
-
-        if i == 1 or i == 0:
-            #print "can't extend"
-            return None
-        else:
-            #print "---- extend ----, i-->", i 
-            
-            return extend_config
+        
+        return numpy.array(config)
 
     def ShortenPath(self, path, timeout=5.0):
         
@@ -175,3 +182,35 @@ class HerbEnvironment(object):
                     path = new_path
         
         return path
+
+    def Extend(self, start_config, end_config):
+        
+        #
+        # TODO: Implement a function which attempts to extend from 
+        #   a start configuration to a goal configuration
+        #
+        
+        stepSize = 0.1
+        numOfInterp = int(self.ComputeDistanceRRT(start_config, end_config)/stepSize)
+        #print "numOfInterp", numOfInterp
+        interp_config = numpy.zeros(len(start_config))
+        i=0
+        
+        for i in range(numOfInterp):
+            for j in range(len(start_config)):
+                interp_config[j] = numpy.linspace(start_config[j], end_config[j], numOfInterp)[i]
+
+            check = self.CollisionChecker_RRT(interp_config)
+
+            if check == False:
+                extend_config = numpy.array(interp_config)
+            else:
+                break
+
+        if i == 1 or i == 0:
+            #print "can't extend"
+            return None
+        else:
+            #print "---- extend ----, i-->", i 
+            
+            return extend_config

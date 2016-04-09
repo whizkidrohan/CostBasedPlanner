@@ -2,6 +2,8 @@ import numpy
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
 import copy
+import time
+import random
 
 class SimpleEnvironment(object):
     
@@ -60,6 +62,19 @@ class SimpleEnvironment(object):
         check = self.robot.GetEnv().CheckCollision(self.robot)
         return check
 
+    def CollisionChecker_RRT(self, config):
+        #config = self.discrete_env.GridCoordToConfiguration(node_coord)
+        config_pose = numpy.array([[ 1, 0,  0, config[0]], 
+                                   [ 0, 1,  0, config[1]], 
+                                   [ 0, 0,  1, 0], 
+                                   [ 0, 0,  0, 1]])
+
+        with self.robot.GetEnv():
+            self.robot.SetTransform(config_pose)
+
+        check = self.robot.GetEnv().CheckCollision(self.robot)
+        return check
+
     def ComputeDistance(self, start_id, end_id):
 
         dist = 0
@@ -71,6 +86,12 @@ class SimpleEnvironment(object):
         dist = abs(start_coord[0] - end_coord[0]) + abs(start_coord[1] - end_coord[1])
         return dist
 
+    def ComputeDistanceRRT(self, start_config, end_config):
+
+        dist = numpy.linalg.norm(numpy.array(start_config) - numpy.array(end_config))
+
+        return dist
+
     def ComputeHeuristicCost(self, start_id, goal_id):
         
         cost = 0
@@ -80,6 +101,24 @@ class SimpleEnvironment(object):
         # given by the two node ids
         cost = self.ComputeDistance(start_id, goal_id)
         return cost
+
+    def GenerateRandomConfiguration(self):
+        config = [0] * 2;
+        #lower_limits, upper_limits = self.boundary_limits
+        #
+        # TODO: Generate and return a random configuration
+        #
+        while True:
+           
+            config = numpy.random.uniform(self.lower_limits, self.upper_limits)
+            
+            check = self.CollisionChecker_RRT(config)
+
+            if check == False:
+                break
+            
+        
+        return numpy.array(config)
     
     def InitializePlot(self, goal_config):
         self.fig = pl.figure()
@@ -112,3 +151,75 @@ class SimpleEnvironment(object):
                 [sconfig[1], econfig[1]],
                 'k.-', linewidth=2.5)
         pl.draw()
+
+    def ShortenPath(self, path, timeout=5.0):
+        
+        # 
+        # TODO: Implement a function which performs path shortening
+        #  on the given path.  Terminate the shortening after the 
+        #  given timout (in seconds).
+        #
+        tstart = time.time()
+
+        while ( (time.time() - tstart) < timeout ):
+
+
+            x1, x2 = sorted(random.sample(range(len(path)), 2))
+
+
+            #x1 = int(numpy.random.uniform(0,len(path)-1))
+            #x2 = int(numpy.random.uniform(x1+1,len(path)-1))
+            start_config = path[x1]
+            end_config = path[x2]
+
+            #print (x1,x2)
+            #print len(path)
+            #print path
+
+            extend_config = self.Extend(start_config, end_config)
+
+            if extend_config != None:
+                if all(extend_config ==  end_config):
+                    
+                    #print "successful connection"
+                    new_path = []
+                    for i in range(0,x1+1):
+                        new_path.append(path[i])
+                    for i in range(x2,len(path)):
+                        new_path.append(path[i])
+                    path = new_path
+ 
+        
+        return path
+
+    def Extend(self, start_config, end_config):
+        
+        #
+        # TODO: Implement a function which attempts to extend from 
+        #   a start configuration to a goal configuration
+        #
+        
+        stepSize = 0.1
+        numOfInterp = int(self.ComputeDistanceRRT(start_config, end_config)/stepSize)
+        #print "numOfInterp", numOfInterp
+        interp_config = numpy.zeros(len(start_config))
+        i=0
+        
+        for i in range(numOfInterp):
+            for j in range(len(start_config)):
+                interp_config[j] = numpy.linspace(start_config[j], end_config[j], numOfInterp)[i]
+
+            check = self.CollisionChecker_RRT(interp_config)
+
+            if check == False:
+                extend_config = numpy.array(interp_config)
+            else:
+                break
+
+        if i == 1 or i == 0:
+            #print "can't extend"
+            return None
+        else:
+            #print "---- extend ----, i-->", i 
+            
+            return extend_config

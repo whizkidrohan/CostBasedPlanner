@@ -23,7 +23,11 @@ def main(robot, planning_env, planner):
         goal_config = numpy.array([3.0, 0.0])
 
     plan = planner.Plan(start_config, goal_config)
-    traj = robot.ConvertPlanToTrajectory(plan)
+    print "planned_plan: ", plan
+    print "... path shortening ..."
+    plan_short = planning_env.ShortenPath(plan)
+    print "ShortenPath: ", plan_short
+    traj = robot.ConvertPlanToTrajectory(plan_short)
 
     raw_input('Press any key to execute trajectory')
     robot.ExecuteTrajectory(traj)
