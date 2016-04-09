@@ -40,14 +40,18 @@ class AStarPlanner(object):
                 if not self.in_closed_list(closed_list, successor):
                     if not self.is_cheaper_in_open_list(open_list.queue,(N[3]+1+self.planning_env.ComputeHeuristicCost(successor,goal_nid),N[2],successor,N[3]+1)):
                         open_list.put((N[3]+1+self.planning_env.ComputeHeuristicCost(successor,goal_nid),N[2],successor,N[3]+1))
-                        if self.visualize and hasattr(self.planning_env, 'InitializePlot'): 
-                            self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
-                                self.planning_env.discrete_env.NodeIdToConfiguration(successor))
+#                        if self.visualize and hasattr(self.planning_env, 'InitializePlot'): 
+#                            self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
+#                                self.planning_env.discrete_env.NodeIdToConfiguration(successor))
         plan.append(start_nid)
-        print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
+        #print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
+        print "nodes", len(closed_list)
         plan = plan[::-1]
         for nodeId in plan:
             plan_config.append(self.planning_env.discrete_env.NodeIdToConfiguration(nodeId))
+        for i in range(len(plan_config)-1):
+            self.planning_env.PlotEdge(plan_config[i],plan_config[i+1])
+    
         return plan_config
 
     def in_closed_list(self,list_of_lists, element):

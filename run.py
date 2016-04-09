@@ -21,13 +21,18 @@ def main(robot, planning_env, planner):
         goal_config = numpy.array([ 4.6, -1.76, 0.00, 1.96, -1.15, 0.87, -1.43] )
     else:
         goal_config = numpy.array([3.0, 0.0])
-        
+    start=time.time() 
     plan = planner.Plan(start_config, goal_config)
-    print "planned_plan: ", plan
+    end= time.time()
+    #print "planned_plan: ", plan
     print "... path shortening ..."
     plan_short = planning_env.ShortenPath(plan)
     print "ShortenPath: ", plan_short
     traj = robot.ConvertPlanToTrajectory(plan_short)
+    
+    duration= end-start
+    print "timetaken TO PLAN", duration
+    print "plan length",len(plan)
 
     raw_input('Press any key to execute trajectory')
     robot.ExecuteTrajectory(traj)
@@ -82,14 +87,14 @@ if __name__ == "__main__":
         planner = BreadthFirstPlanner(planning_env, visualize)
     elif args.planner == 'dfs':
         planner = DepthFirstPlanner(planning_env, visualize)
-    elif args.planner == 'hrrt':
+    elif args.planner == 'hrrt': 
         planner = HeuristicRRTPlanner(planning_env, visualize)
     else:
         print 'Unknown planner option: %s' % args.planner
         exit(0)
 
     main(robot, planning_env, planner)
-
+    
     import IPython
     IPython.embed()
 

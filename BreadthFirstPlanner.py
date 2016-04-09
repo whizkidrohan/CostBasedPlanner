@@ -36,13 +36,17 @@ class BreadthFirstPlanner(object):
                 if not self.in_closed_list(closed_list, successor):
                     if not (N[0]+1,N[2],successor) in open_list.queue:
                         open_list.put((N[0]+1,N[2],successor))
-                        self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
-                            self.planning_env.discrete_env.NodeIdToConfiguration(successor))
+                        #self.planning_env.PlotEdge(self.planning_env.discrete_env.NodeIdToConfiguration(N[2]), \
+                         #   self.planning_env.discrete_env.NodeIdToConfiguration(successor))
         plan.append(start_nid)
-        print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
+       # print "Start:" , start_nid , " Goal:" , goal_nid , " Plan: " , plan[::-1]
+	print "nodes:",len(closed_list)
         plan = plan[::-1]
         for nodeId in plan:
             plan_config.append(self.planning_env.discrete_env.NodeIdToConfiguration(nodeId))
+        for i in range(len(plan_config)-1):
+            self.planning_env.PlotEdge(plan_config[i],plan_config[i+1])
+    
         return plan_config
 
     def in_closed_list(self,list_of_lists, element):
