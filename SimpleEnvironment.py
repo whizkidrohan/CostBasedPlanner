@@ -223,3 +223,34 @@ class SimpleEnvironment(object):
             #print "---- extend ----, i-->", i 
             
             return extend_config
+            
+    def Extend_max(self, start_config, end_config, max_extend):
+        
+        #
+        # TODO: Implement a function which attempts to extend from 
+        #   a start configuration to a goal configuration
+        #
+        
+        plan_step_size = 0.05
+        unit_vec = end_config - start_config #[x - y for x, y in zip(end_config,start_config)]
+        dist = numpy.linalg.norm(unit_vec)
+        unit_vec = [i / dist for i in unit_vec]
+        count = 0
+        curr_config = start_config
+        c3 = False
+        while True:
+          #print count
+          c1 = count*plan_step_size < dist  #condition 1: end_config is not  reached
+          c2 =  count*plan_step_size < max_extend #condition 2: within boundaries
+
+          if  not c1: return end_config
+          if not c2: return numpy.array(curr_config) - plan_step_size*numpy.array(unit_vec)
+          c3 = not self.CollisionChecker_RRT(curr_config) #condition 3: robot is not in collision
+          if not c3: break
+          count += 1
+          curr_config = [ x + count*plan_step_size*y for x,y in zip(start_config, unit_vec)]
+        #print curr_config, start_config  
+        if all([i == j for i,j in zip(curr_config,start_config)]): return None
+        curr_config = [ x - plan_step_size*y for x,y in zip(start_config, unit_vec)]
+        if all([i == j for i,j in zip(curr_config,start_config)]): return None
+        return numpy.array(curr_config)
